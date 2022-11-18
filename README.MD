@@ -33,11 +33,15 @@ There is a 0.5% developer fee while using SigmaBonds, which is taken from the le
 An additional 0.4% may be taken by frontend developers who implement a UI for
 SigmaBonds.
 
-## Protocol
+# Protocol
 There are 4 main transactions which must be implemented from a frontend interface
-in order to interact with the SigmaBonds protocol.
+in order to interact with the SigmaBonds protocol. There are also a number of known contract
+addresses to interact with.
 
-# Tx 1: Open Bond Order
+## Contract Addresses
+Coming Soon :^)
+
+## Tx 1: Open Bond Order
 In this transaction, a borrower wishes to create a new bond request / order on the
 blockchain. The borrower will send all the collateral (assets + ERG) they wish
 to use for their bond to a utxo under the bond order contract. On this outputted UTXO, they
@@ -47,7 +51,7 @@ will set the following registers to record information about their potential bon
 - R6: Total Repayment (In tokens / nanoERGs): `Long`
 - R7: Bond Maturity Height: `Int`
 
-# Tx 2: Close Bond Order
+## Tx 2: Close Bond Order
 In this transaction, a lender has found a bond order they wish to fulfill by sending
 the principal amount back to the borrower. The lender will first create a
 bond contract utxo in `OUTPUTS(0)`. They will set the following registers on it:
@@ -60,7 +64,7 @@ bond contract utxo in `OUTPUTS(0)`. They will set the following registers on it:
 At the same time, `OUTPUTS(1)` will have a utxo going to the borrower's PK, which
 is holding the total principal amount specified by the borrower in R5 of the order contract.
 If the principal is in tokens, the only value of ERG that can be accepted is `0.001`
-# Tx 3: RePay Bond Order
+## Tx 3: RePay Bond Order
 Once a bond order has been fulfilled / closed, a bond utxo with specific information then exists on the blockchain. If the
 borrower is able to get the repayment value in time before the maturity height is reached, they may perform
 a repayment transaction. In this transaction, the repayment value is sent to the lender (must have `0.001` ERG in it if it
@@ -72,7 +76,7 @@ On `OUTPUTS(0)`, the following registers exist:
 
 
 Only the borrower may sign and initiate this transaction.
-# Tx 4: Liquidate Bond Collateral
+## Tx 4: Liquidate Bond Collateral
 In the case that a borrower does not repay their bond order by the maturity height, the lender may
 sign and initiate a liquidation transaction. In this transaction, the total amount of collateral held in
 the bond utxo is all sent to the lender's PK in `OUTPUTS(0)`.
