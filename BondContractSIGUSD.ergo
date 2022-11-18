@@ -1,0 +1,59 @@
+{
+    // Bond Contract SIGUSD
+    // Borrowers's collateral is stored in a utxo under this contract. If borrower spends the box before the
+    // maturity height, then they are repaying the loan with interest in SIGUSD. If the lender spends the
+    // box after the maturity height, then they may liquidate the bond and gain the collateral behind it.
+    // R4: Box id of originating order: Coll[Byte]
+    // R5: borrowerPK: SigmaProp
+    // R6: Total Repayment (In number of raw / non-decimaled SIGUSD tokens): Long
+    // R7: Bond Maturity Height: Int
+    // R8: lenderPK: SigmaProp
+    // Definitions in OpenOrder contract
+
+    val borrowerPK          = SELF.R5[SigmaProp].get
+    val repayment           = SELF.R6[Long].get
+    val maturityHeight      = SELF.R7[Int].get
+    val lenderPK            = SELF.R8[SigmaProp].get
+    val collateralAssets    = SELF.tokens
+    val collateralERG       = SELF.value
+    val repaymentBox        = OUTPUTS(0)
+
+    // Constants
+    // _SIGUSD_Id: Token id of SIGUSD
+
+
+    val liquidated = {
+        allOf(
+            Coll(
+                HEIGHT >= maturityHeight,
+                repaymentBox.propositionBytes   == lenderPK.propBytes,
+                repaymentBox.tokens             == collateralAssets,
+                repaymentBox.value              == collateralERG,
+                repaymentBox.R4[Coll[Byte]].get == SELF.id
+            )
+        )
+    }
+    // Collateral box returned to borrower
+    val returnBox           = OUTPUTS(1)
+    val repaid = {
+        allOf(
+            Coll(
+                // RepaymentBox Conditions
+                HEIGHT < maturityHeight,
+                repaymentBox.propositionBytes   == lenderPK.propBytes,
+                repaymentBox.value              == (1000L * 1000L),
+                repaymentBox.tokens(0)._1       == _SIGUSD_Id,
+                repaymentBox.tokens(0)._2       == repayment,
+                repaymentBox.tokens.size        == 1,
+                repaymentBox.R4[Coll[Byte]].get == SELF.id,
+                // ReturnBox Conditions
+                returnBox.propositionBytes      == borrowerPK.propBytes,
+                returnBox.tokens                == collateralAssets,
+                returnBox.value                 == collateralERG
+            )
+        )
+    }
+
+    (sigmaProp(liquidated) && lenderPK) || (sigmaProp(repaid) && borrowerPK)
+
+}
