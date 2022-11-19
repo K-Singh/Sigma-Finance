@@ -7,8 +7,8 @@
     // R6: Total Repayment (In number of raw / non-decimaled SIGUSD tokens): Long
     // R7: Bond Maturity Height: Int
 
-    // Principal represents the amount of SIGUSD the borrower gets immediately upon a Bond order being taken by a lender.
-    // Total Repayment is the amount of SIGUSD the lender must receive before the maturity height, in order for
+    // Principal represents the amount of tokens the borrower gets immediately upon a Bond order being taken by a lender.
+    // Total Repayment is the amount of tokens the lender must receive before the maturity height, in order for
     // the borrower to not be liquidated
     // Bond Maturity Height is the height at which the borrower may be liquidated if the Bond has not been repaid yet.
     // The collateral for the Bond is the total contents of all assets + ERG within this box
@@ -20,7 +20,7 @@
     val totalERG        = SELF.value
 
     // Constants
-    // _TokenId: Token id of bond currency
+    // _tokenId: Token id of bond currency
     // _bondContractHash: Hash of bond contract
     // _devPK: PK of dev :^)
 
@@ -68,7 +68,7 @@
                     // Loan Conditions
                     loanBox.propositionBytes   == borrowerPK.propBytes,
                     loanBox.value              == (1000L * 1000L),
-                    loanBox.tokens(0)._1       == _TokenId,
+                    loanBox.tokens(0)._1       == _tokenId,
                     loanBox.tokens(0)._2       == principal,
                     loanBox.tokens.size        == 1
                 )
@@ -84,7 +84,7 @@
                         Coll(
                             devOutput.propositionBytes      == fees(0)._1.propBytes,
                             devOutput.value                 == (1000L * 1000L),
-                            devOutput.tokens(0)._1          == _TokenId,
+                            devOutput.tokens(0)._1          == _tokenId,
                             devOutput.tokens(0)._2.toBigInt == fees(0)._2,
                             devOutput.tokens.size           == 1
                         )
@@ -102,7 +102,7 @@
                             Coll(
                                 uiOutput.propositionBytes       == fees(1)._1.propBytes,
                                 uiOutput.value                  == (1000L * 1000L),
-                                uiOutput.tokens(0)._1           == _TokenId,
+                                uiOutput.tokens(0)._1           == _tokenId,
                                 uiOutput.tokens(0)._2.toBigInt  == fees(1)._2,
                                 uiOutput.tokens.size            == 1
                             )
