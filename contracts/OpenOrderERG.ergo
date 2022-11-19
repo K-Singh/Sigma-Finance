@@ -10,12 +10,12 @@
     // Principal represents the amount of nanoERG the borrower gets immediately upon a Bond order being taken by a lender.
     // Total Repayment is the amount of nanoERG the lender must receive before the maturity height, in order for
     // the borrower to not be liquidated
-    // Bond Maturity Height is the height at which the borrower may be liquidated if the Bond has not been repaid yet.
+    // Bond Maturity Length is the number of blocks after which the borrower may be liquidated if the Bond has not been repaid yet.
     // The collateral for the Bond is the total contents of all assets + ERG within this box
     val borrowerPK      = SELF.R4[SigmaProp].get
     val principal       = SELF.R5[Long].get
     val repayment       = SELF.R6[Long].get
-    val maturityHeight  = SELF.R7[Int].get
+    val maturityLength  = SELF.R7[Int].get
     val totalAssets     = SELF.tokens
     val totalERG        = SELF.value
 
@@ -56,15 +56,25 @@
         val orderMade   = {
             allOf(
                 Coll(
+
                     // Bond Box Conditions
                     bondBox.R4[Coll[Byte]].get == SELF.id,
                     bondBox.R5[SigmaProp].get  == borrowerPK,
                     bondBox.R6[Long].get       == repayment,
-                    bondBox.R7[Int].get        == maturityHeight,
+
                     bondBox.R8[SigmaProp].isDefined,
                     bondBox.tokens             == totalAssets,
                     bondBox.value              == totalERG,
 
+                    // Maturity Conditions
+                    maturityLength             >= 30, // All bond orders must at least have duration of 30 blocks
+
+                    bondBox.R7[Int].get - (HEIGHT + maturityLength) <= 8, // We allow 8 blocks for a tx spending this box
+                    bondBox.R7[Int].get - (HEIGHT + maturityLength) >= 0, // to be confirmed, and assume maturity height
+                                                                          // of bond box is HEIGHT + maturityLength
+                                                                          // at time of transaction send.
+                                                                          // Should prevent tx's disappearing from
+                                                                          // mempool.
                     // Loan Conditions
                     loanBox.propositionBytes   == borrowerPK.propBytes,
                     loanBox.value              == principal
