@@ -23,7 +23,9 @@ There is no official UI associated with SigmaBonds. Please be sure that any UI
 interacting with the SigmaBonds protocol uses known contract addresses and is trusted. Frontend
 developers who create a UI for SigmaBonds can get a 0.4% fee for their implementation.
 To get the fee, add your address' `SigmaProp` as Context Variable 0 on the Open Order UTXO whenever
-an open bond request is taken/spent by a lender.
+an open bond request is taken/spent by a lender. Additionally, add an output box under your address,
+whose ERG / token value will contain exactly `(400 * principal) / 100000)` tokens / nanoERGs.
+The UI fee output will be `OUTPUTS(3)`. `OUTPUTS(2)` will be the dev fee, with a value of `(500 * principal) / 100000)`
 
 ## Token
 SigmaBonds has no plans to make a token, and likely never will.
