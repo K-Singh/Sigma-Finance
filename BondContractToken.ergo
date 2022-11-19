@@ -19,7 +19,7 @@
     val repaymentBox        = OUTPUTS(0)
 
     // Constants
-    // _SIGUSD_Id: Token id of SIGUSD
+    // _TokenId: Token id of bond currency
 
 
     val liquidated = {
@@ -42,7 +42,7 @@
                 HEIGHT < maturityHeight,
                 repaymentBox.propositionBytes   == lenderPK.propBytes,
                 repaymentBox.value              == (1000L * 1000L),
-                repaymentBox.tokens(0)._1       == _SIGUSD_Id,
+                repaymentBox.tokens(0)._1       == _TokenId,
                 repaymentBox.tokens(0)._2       == repayment,
                 repaymentBox.tokens.size        == 1,
                 repaymentBox.R4[Coll[Byte]].get == SELF.id,
