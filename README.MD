@@ -18,6 +18,12 @@ can be used to slowly gain yield on ERG or a native asset of their choice. Flexi
 for lenders to have more options when evaluating loans (e.g. A lender may be willing to take less collateral
 from entities they deem to be "trusted". Borrower identities can be verified via Public Key or ErgoNames).
 
+### Extensions: Lender Based Bond Market
+We can create extensions of the protocol which allow for lender-based bond markets. During order closing,
+lender can mint an NFT, and set the lenderPK on the bond UTXO to be of some contract which allows spending
+of the collateral or repayment by spending a box which contains the NFT. In this way, lenders can trade
+the NFT to speculate on the value of the bond.
+
 ## UI
 There is no official UI associated with SigmaBonds. Please be sure that any UI
 interacting with the SigmaBonds protocol uses known contract addresses and is trusted. Frontend
