@@ -51,6 +51,6 @@
         )
     }
 
-    (sigmaProp(liquidated) && lenderPK) || (sigmaProp(repaid) && borrowerPK)
+    (sigmaProp(liquidated)) || (sigmaProp(repaid) && borrowerPK)
 
 }

@@ -41,8 +41,9 @@ in order to interact with the SigmaBonds protocol. There are also a number of kn
 addresses to interact with.
 
 ## Contract Addresses
-
+#### NOTE: Will update this soon, not representing current contracts
 ### ERG-based bonds
+
 Mainnet Order Contract:
 `6e2MJgyvdiwRcydTVD1kzwqgCk2Hzwyw1mMZtXEMrkMcodbqyLteoYJr5nvL5ZqdhjY7FQcuRKAktBLu8pudgDxW8vJ2kAcwuVgDpeFC5euKUdBai6TbEFEozdQk9kySdKwVpg4c9phFNnvfYRUY2eFNrgv4bL1iQfgMvpkyeJDPrXmVPuKDzyGP2PQCokq4hS7MfPAg5SMi5nRpNcPnbXqC43itnC9qnqqeBMgnBb7sKESj1QywEzdGpwXXWtpf1sB6yPGDHY8xycdet3PjeX5yZobaoWFXuyDU9VtpuYckE11HGsvGx6iquAsuukJoWdFznpMLt3JruTpxmm4CJWk2Z452n9RYsdvVp6brBw3DRAdayrn49gbrsw5DPDne61yoyaLWY4X8JrgAVtniis9WrR6Wpoqxy39K8CZFCfb6gSorFcB7PRLkgoLcXQ1nJ6FkuzLPQio7C2geWdoopmFoMk8EiuuoCGwmRgRTMgKkC87yaqPL529DhDE4YC19Tiwk6jHzb8d4QmtYzce7ZDNrcTwKYm5EoTvjAoCt1pEjYt3FeUPtrLZwHvLTxMupMYykQ1bg3B7fTkunNr6JJQEBkYdvFbRDro2dFcJEzSvFCL2gh63P2iqECDY77tGaPikhw3NjV1Z3r9b`
 
@@ -75,9 +76,15 @@ will set the following registers to record information about their potential bon
 - R4: Borrower's PK: `SigmaProp`
 - R5: Bond Principal (In tokens / nanoERGs): `Long`
 - R6: Total Repayment (In tokens / nanoERGs): `Long`
-- R7: Bond Duration (Total amount of blocks for bond to be repaid): `Int`
+- R7: Maturity: `Int`
 
-Bond duration is a minimum of 30 blocks.
+Bond Maturity comes in two different forms:
+If maturity is of negative value, then it represents bond which expires a number of blocks after
+closing of the order. In this case, value must be less than or equal to -30 (meaning minimum duration of 30 blocks).
+We can call this an "On-Close" order.
+
+If maturity is of positive value, then closing of the order ensures the bond expires at the exact
+value stored in R7. We can call this a "Fixed Height" order.
 ## Tx 2: Close Bond Order
 In this transaction, a lender has found a bond order they wish to fulfill by sending
 the principal amount back to the borrower. The lender will first create a
@@ -88,9 +95,17 @@ bond contract utxo in `OUTPUTS(0)`. They will set the following registers on it:
 - R7: Bond Maturity Height (Height at which bond may be liquidated): `Int` 
 - R8: lenderPK: `SigmaProp`
 
-The bond maturity height is derived by taking the current height of the blockchain + the bond duration
+There are two ways to derive Bond Maturity Height, depending on the `maturity` stored in R7 of the Open
+Order UTXO.
+
+If `maturity` is negative (Is an "On-Close" order):
+The bond maturity height is derived by taking the current height of the blockchain + abs(`maturity`)
 on R7 of the Open Order input box. If a close bond tx is not confirmed within 8 blocks after being
 sent to the mempool, the transaction may disappear.
+
+If `maturity` is positive (Is a "Fixed Height" order):
+Simply copy the value of `maturity` into the bond maturity height (So copying R7 of open order into R7 of
+bond utxo).
 
 At the same time, `OUTPUTS(1)` will have a utxo going to the borrower's PK, which
 is holding the total principal amount specified by the borrower in R5 of the order contract.
