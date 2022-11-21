@@ -1,0 +1,132 @@
+{
+    // Open Order SIGUSD/tokens Contract
+    // Borrowers send their collateralized ERG and/or tokens, along with setting the following registers
+    // to specify details about the SigmaBond they wish to make
+    // R4: Borrower's PK: SigmaProp
+    // R5: Bond Principal (In number of raw / non-decimaled SIGUSD tokens): Long
+    // R6: Total Repayment (In number of raw / non-decimaled SIGUSD tokens): Long
+    // R7: Bond Maturity Height: Int
+
+    // Principal represents the amount of tokens the borrower gets immediately upon a Bond order being taken by a lender.
+    // Total Repayment is the amount of tokens the lender must receive before the maturity height, in order for
+    // the borrower to not be liquidated
+    // Bond Maturity Height is the height at which the borrower may be liquidated if the Bond has not been repaid yet.
+
+    val borrowerPK      = SELF.R4[SigmaProp].get
+    val principal       = SELF.R5[Long].get
+    val repayment       = SELF.R6[Long].get
+    val maturityHeight  = SELF.R7[Int].get
+    val totalAssets     = SELF.tokens
+    val totalERG        = SELF.value
+
+    // Constants
+    // _tokenId: Token id of bond currency
+    // _bondContractHash: Hash of bond contract
+    // _devPK: PK of dev :^)
+
+    // Output box if open order is closed.
+    val bondBox         = OUTPUTS(0)
+    val orderIsClosed   = _bondContractHash == blake2b256( bondBox.propositionBytes )
+
+    // Optional UI Fee Address, which may be inserted into context vars
+    val optUIFee        = getVar[SigmaProp](0)
+
+    // We use BigInts to help deal with long overflow on large value bonds
+    val fees: Coll[(SigmaProp, BigInt)] = {
+
+        val feeDenom = 100000L
+        val devFee   = 500L
+        // If ui fee is defined, then we add an additional 0.4% fee
+        if(optUIFee.isDefined){
+            val uiFee = 400L
+
+            Coll(
+                (_devPK, (devFee.toBigInt * principal.toBigInt) / feeDenom.toBigInt),
+                (optUIFee.get, (uiFee.toBigInt * principal.toBigInt) / feeDenom.toBigInt)
+            )
+        }else{
+            Coll( (_devPK, (devFee.toBigInt * principal.toBigInt) / feeDenom.toBigInt) )
+        }
+    }
+
+    if(orderIsClosed){
+        // Order Matched / Closed path
+        val loanBox     = OUTPUTS(1)
+
+        val orderMade   = {
+            allOf(
+                Coll(
+                    // Bond Box Conditions
+                    bondBox.R4[Coll[Byte]].get == SELF.id,
+                    bondBox.R5[SigmaProp].get  == borrowerPK,
+                    bondBox.R6[Long].get       == repayment,
+
+                    bondBox.R8[SigmaProp].isDefined,
+                    bondBox.tokens             == totalAssets,
+                    bondBox.value              == totalERG,
+
+                    // Maturity Conditions
+                    bondBox.R7[Int].get        == maturityHeight,
+
+                    // Loan Conditions
+                    loanBox.propositionBytes   == borrowerPK.propBytes,
+                    loanBox.value              == 1000000L,
+                    loanBox.tokens(0)._1       == _tokenId,
+                    loanBox.tokens(0)._2       == principal,
+                    loanBox.tokens.size        == 1
+                )
+            )
+        }
+
+
+
+        // Ensure that correct fee output boxes exist
+        val feesPaid = {
+
+            val devFeesPaid = {
+                if(fees(0)._2 > 0){ // Dev fee is greater than 0
+                    val devOutput   = OUTPUTS(2)
+                    allOf(
+                        Coll(
+                            devOutput.propositionBytes      == fees(0)._1.propBytes,
+                            devOutput.value                 == 1000000L,
+                            devOutput.tokens(0)._1          == _tokenId,
+                            devOutput.tokens(0)._2.toBigInt == fees(0)._2,
+                            devOutput.tokens.size           == 1
+                        )
+                    )
+                }else{
+                    true // do nothing if dev fee doesn't add up greater than 0, prevents errors on low value bonds
+                }
+            }
+
+            val uiFeesPaid = {
+                if(optUIFee.isDefined){
+                    if(fees(1)._2 > 0){ // UI fee is greater than 0
+                        val uiOutput    = OUTPUTS(3)
+                        allOf(
+                            Coll(
+                                uiOutput.propositionBytes       == fees(1)._1.propBytes,
+                                uiOutput.value                  == 1000000L,
+                                uiOutput.tokens(0)._1           == _tokenId,
+                                uiOutput.tokens(0)._2.toBigInt  == fees(1)._2,
+                                uiOutput.tokens.size            == 1
+                            )
+                        )
+                    }else{
+                        true // do nothing if ui fee doesn't end up greater than 0, prevents errors on low value bonds
+                    }
+                }else{
+                    true // if ui fee isn't defined, then default to true.
+                }
+            }
+            devFeesPaid && uiFeesPaid
+        }
+
+        sigmaProp(orderMade && feesPaid)
+    }else{
+        // Refund Path
+        borrowerPK
+    }
+
+}

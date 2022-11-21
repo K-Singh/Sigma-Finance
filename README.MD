@@ -85,12 +85,12 @@ will set the following registers to record information about their potential bon
 - R7: Maturity: `Int`
 
 Bond Maturity comes in two different forms:
-If maturity is of negative value, then it represents bond which expires a number of blocks after
-closing of the order. In this case, value must be less than or equal to -30 (meaning minimum duration of 30 blocks).
-We can call this an "On-Close" order.
+If order is of "OnClose" type, then it represents bond which expires a number of blocks after
+closing of the order. In this case, value must be greater than or equal to 30 (meaning minimum duration of 30 blocks).
 
-If maturity is of positive value, then closing of the order ensures the bond expires at the exact
-value stored in R7. We can call this a "Fixed Height" order.
+
+If order is of "FixedHeight" type, then the
+value stored in maturity is copied into R7 of the bond box.
 ## Tx 2: Close Bond Order
 In this transaction, a lender has found a bond order they wish to fulfill by sending
 the principal amount back to the borrower. The lender will first create a
@@ -104,12 +104,12 @@ bond contract utxo in `OUTPUTS(0)`. They will set the following registers on it:
 There are two ways to derive Bond Maturity Height, depending on the `maturity` stored in R7 of the Open
 Order UTXO.
 
-If `maturity` is negative (Is an "On-Close" order):
-The bond maturity height is derived by taking the current height of the blockchain + abs(`maturity`)
+If `maturity` is on an "On-Close" order:
+The bond maturity height is derived by taking the current height of the blockchain + `maturity`
 on R7 of the Open Order input box. If a close bond tx is not confirmed within 8 blocks after being
 sent to the mempool, the transaction may disappear.
 
-If `maturity` is positive (Is a "Fixed Height" order):
+If `maturity` is on a "Fixed Height" order:
 Simply copy the value of `maturity` into the bond maturity height (So copying R7 of open order into R7 of
 bond utxo).
 

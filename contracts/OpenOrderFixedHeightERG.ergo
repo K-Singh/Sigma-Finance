@@ -11,15 +11,12 @@
     // Total Repayment is the amount of tokens the lender must receive before the maturity height, in order for
     // the borrower to not be liquidated
     // Bond Maturity Height is the height at which the borrower may be liquidated if the Bond has not been repaid yet.
-    // Bond Maturity Length is duration of Bond, which is starting at open order closing.
-    // If maturity is negative, we use length. If maturity is positive, we use height.
-    // If using length, value must be less than -30 (So 30 block length of bond).
     // The collateral for the Bond is the total contents of all assets + ERG within this box
 
     val borrowerPK      = SELF.R4[SigmaProp].get
     val principal       = SELF.R5[Long].get
     val repayment       = SELF.R6[Long].get
-    val maturity        = SELF.R7[Int].get
+    val maturityHeight  = SELF.R7[Int].get
     val totalAssets     = SELF.tokens
     val totalERG        = SELF.value
 
@@ -70,6 +67,9 @@
                     bondBox.tokens             == totalAssets,
                     bondBox.value              == totalERG,
 
+                    // Maturity Conditions
+                    bondBox.R7[Int].get        == maturityHeight,
+
                     // Loan Conditions
                     loanBox.propositionBytes   == borrowerPK.propBytes,
                     loanBox.value              == principal
@@ -77,28 +77,6 @@
             )
         }
 
-
-        // Maturity Conditions
-        val maturityValid = {
-            if(maturity < 0){
-                val maturityLength = -1 * maturity
-                allOf(
-                    Coll(
-                        // Maturity Conditions
-                        maturityLength             >= 30, // All bond orders with duration must at least have duration of 30 blocks
-
-                        (HEIGHT + maturityLength) - bondBox.R7[Int].get <= 8, // We allow 8 blocks for a tx spending this box
-                        (HEIGHT + maturityLength) - bondBox.R7[Int].get >= 0  // to be confirmed, and assume maturity height
-                                                                              // of bond box is HEIGHT + maturityLength
-                                                                              // at time of transaction send.
-                                                                              // Should prevent tx's disappearing from
-                                                                              // mempool
-                    )
-                )
-            }else{
-                bondBox.R7[Int].get == maturity // If using height, simply check equality of maturityHeight on both boxes
-            }
-        }
 
         // Ensure that correct fee output boxes exist
         val feesPaid = {
@@ -137,7 +115,7 @@
             devFeesPaid && uiFeesPaid
         }
 
-        sigmaProp(orderMade && feesPaid && maturityValid)
+        sigmaProp(orderMade && feesPaid)
     }else{
         // Refund Path
         borrowerPK
