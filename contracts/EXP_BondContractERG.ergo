@@ -1,0 +1,66 @@
+{
+    // ======================== EXPERIMENTAL ========================
+    // ERG bond contract which also holds hashed prop bytes of special liquidation script in R9, allowing
+    // for more complex liquidation logic outside of height condition
+    // R4: Box id of originating order: Coll[Byte]
+    // R5: borrowerPK: SigmaProp
+    // R6: Total Repayment (In nanoERGs): Long
+    // R7: Bond Maturity Height: Int
+    // R8: lenderPK: SigmaProp
+    // R9: hashedLiqScriptPropBytes: Coll[Byte]
+    // We use hashed prop bytes because I imagine real liquidation scripts may be complicated (and therefore large)
+    // Definitions in OpenOrder contract
+
+    val borrowerPK          = SELF.R5[SigmaProp].get
+    val repayment           = SELF.R6[Long].get
+    val maturityHeight      = SELF.R7[Int].get
+    val lenderPK            = SELF.R8[SigmaProp].get
+    val hashedLiqScript     = SELF.R9[Coll[Byte]].get
+    val collateralAssets    = SELF.tokens
+    val collateralERG       = SELF.value
+    val repaymentBox        = OUTPUTS(0)
+
+    val liquidationScript   = getVar[SigmaProp](0)
+    // Constants
+    // None
+
+    val liquidationConditions = {
+      if(liquidationScript.isDefined){
+        val matchedHash = blake2b256( liquidationScript.get.propBytes ) == hashedLiqScript
+
+        sigmaProp(matchedHash) && liquidationScript.get
+      }else{
+        sigmaProp(HEIGHT >= maturityHeight)
+      }
+    }
+    val liquidated = {
+        allOf(
+            Coll(
+                repaymentBox.propositionBytes   == lenderPK.propBytes,
+                repaymentBox.tokens             == collateralAssets,
+                repaymentBox.value              == collateralERG,
+                repaymentBox.R4[Coll[Byte]].get == SELF.id
+            )
+        )
+    }
+    // Collateral box returned to borrower
+    val returnBox           = OUTPUTS(1)
+    val repaid = {
+        allOf(
+            Coll(
+                // RepaymentBox Conditions
+                HEIGHT < maturityHeight,
+                repaymentBox.propositionBytes   == lenderPK.propBytes,
+                repaymentBox.value              == repayment,
+                repaymentBox.R4[Coll[Byte]].get == SELF.id,
+                // ReturnBox Conditions
+                returnBox.propositionBytes      == borrowerPK.propBytes,
+                returnBox.tokens                == collateralAssets,
+                returnBox.value                 == collateralERG
+            )
+        )
+    }
+
+    (sigmaProp(liquidated) && liquidationConditions) || (sigmaProp(repaid) && borrowerPK)
+
+}

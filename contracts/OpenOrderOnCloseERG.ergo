@@ -72,7 +72,7 @@
                     maturityLength             >= 30, // All bond orders with duration must at least have duration of 30 blocks
 
                     (HEIGHT + maturityLength) - bondBox.R7[Int].get <= 8, // We allow 8 blocks for a tx spending this box
-                    (HEIGHT + maturityLength) - bondBox.R7[Int].get >= 0  // to be confirmed, and assume maturity height
+                    (HEIGHT + maturityLength) - bondBox.R7[Int].get >= 0, // to be confirmed, and assume maturity height
                                                                           // of bond box is HEIGHT + maturityLength
                                                                           // at time of transaction send.
                                                                           // Should prevent tx's disappearing from
