@@ -6,7 +6,7 @@
     val expiryHeight        = SELF.R7[Int].get
     val buyerPK             = SELF.R8[SigmaProp].get
     val underlyingAssets    = SELF.tokens
-    val paymentBox        = OUTPUTS(0)
+    val paymentBox          = OUTPUTS(0)
 
     // Constants
     // _tokenId: Token id of payment currency
@@ -19,6 +19,7 @@
                 paymentBox.propositionBytes   == sellerPK.propBytes,
                 paymentBox.tokens             == underlyingAssets,
                 paymentBox.R4[Coll[Byte]].get == SELF.id
+                paymentBox.value              == 1000000L,
             )
         )
     }
@@ -38,10 +39,11 @@
                 // ReturnBox Conditions
                 returnBox.propositionBytes    == buyerPK.propBytes,
                 returnBox.tokens              == underlyingAssets,
+                returnBox.value               == 1000000L,
             )
         )
     }
 
-    (sigmaProp(expired)) || (sigmaProp(executed) && buyerPK)
+    (sigmaProp(expired)) || (sigmaProp(executed))
 
 }
