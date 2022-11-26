@@ -1,0 +1,47 @@
+{
+    // Covered Call Contract with underlying asset being a token, and priced in a token
+
+    val sellerPK            = SELF.R5[SigmaProp].get
+    val strikePrice         = SELF.R6[Long].get
+    val expiryHeight        = SELF.R7[Int].get
+    val buyerPK             = SELF.R8[SigmaProp].get
+    val underlyingAssets    = SELF.tokens
+    val paymentBox        = OUTPUTS(0)
+
+    // Constants
+    // _tokenId: Token id of payment currency
+
+
+    val expired = {
+        allOf(
+            Coll(
+                HEIGHT >= expiryHeight,
+                paymentBox.propositionBytes   == sellerPK.propBytes,
+                paymentBox.tokens             == underlyingAssets,
+                paymentBox.R4[Coll[Byte]].get == SELF.id
+            )
+        )
+    }
+    // Option contract is executed by buyer
+    val returnBox           = OUTPUTS(1)
+    val executed = {
+        allOf(
+            Coll(
+                // RepaymentBox Conditions
+                HEIGHT < expiryHeight,
+                paymentBox.propositionBytes   == sellerPK.propBytes,
+                paymentBox.value              == 1000000L,
+                paymentBox.tokens(0)._1       == _tokenId,
+                paymentBox.tokens(0)._2       == strikePrice,
+                paymentBox.tokens.size        == 1,
+                paymentBox.R4[Coll[Byte]].get == SELF.id,
+                // ReturnBox Conditions
+                returnBox.propositionBytes    == buyerPK.propBytes,
+                returnBox.tokens              == underlyingAssets,
+            )
+        )
+    }
+
+    (sigmaProp(expired)) || (sigmaProp(executed) && buyerPK)
+
+}
