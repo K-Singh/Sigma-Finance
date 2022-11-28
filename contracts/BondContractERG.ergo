@@ -21,36 +21,37 @@
     // Constants
     // None
 
+  if(HEIGHT >= maturityHeight){
+      val liquidated = {
+          allOf(
+              Coll(
 
-    val liquidated = {
-        allOf(
-            Coll(
-                HEIGHT >= maturityHeight,
-                repaymentBox.propositionBytes   == lenderPK.propBytes,
-                repaymentBox.tokens             == collateralAssets,
-                repaymentBox.value              == collateralERG,
-                repaymentBox.R4[Coll[Byte]].get == SELF.id
-            )
-        )
-    }
-    // Collateral box returned to borrower
-    val returnBox           = OUTPUTS(1)
-    val repaid = {
-        allOf(
-            Coll(
-                // RepaymentBox Conditions
-                HEIGHT < maturityHeight,
-                repaymentBox.propositionBytes   == lenderPK.propBytes,
-                repaymentBox.value              == repayment,
-                repaymentBox.R4[Coll[Byte]].get == SELF.id,
-                // ReturnBox Conditions
-                returnBox.propositionBytes      == borrowerPK.propBytes,
-                returnBox.tokens                == collateralAssets,
-                returnBox.value                 == collateralERG
-            )
-        )
-    }
+                  repaymentBox.propositionBytes   == lenderPK.propBytes,
+                  repaymentBox.tokens             == collateralAssets,
+                  repaymentBox.value              == collateralERG,
+                  repaymentBox.R4[Coll[Byte]].get == SELF.id
+              )
+          )
+      }
+      sigmaProp(liquidated)
+    }else{
+      // Collateral box returned to borrower
+      val returnBox           = OUTPUTS(1)
+      val repaid = {
+          allOf(
+              Coll(
+                  // RepaymentBox Conditions
+                  repaymentBox.propositionBytes   == lenderPK.propBytes,
+                  repaymentBox.value              == repayment,
+                  repaymentBox.R4[Coll[Byte]].get == SELF.id,
+                  // ReturnBox Conditions
+                  returnBox.propositionBytes      == borrowerPK.propBytes,
+                  returnBox.tokens                == collateralAssets,
+                  returnBox.value                 == collateralERG
+              )
+          )
+      }
 
-    (sigmaProp(liquidated)) || (sigmaProp(repaid) && borrowerPK)
-
+      sigmaProp(repaid) && borrowerPK
+  }
 }

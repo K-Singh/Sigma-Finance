@@ -11,6 +11,7 @@ lazy val root = (project in file("."))
 libraryDependencies ++= Seq(
   "org.ergoplatform" %% "ergo-appkit" % "5.0.0",
   "org.slf4j" % "slf4j-jdk14" % "1.7.36",
+  "org.scalatest" %% "scalatest" % "3.2.14" % "test"
 )
 
 resolvers ++= Seq(

@@ -1,9 +1,12 @@
+package ksingh.sigmabonds
+package client
+
 import org.ergoplatform.appkit.{BlockchainContext, NetworkType, RestApiErgoClient}
 
-object ContractClient extends App{
+object ContractClient extends App {
 
-  val networkType: NetworkType = NetworkType.TESTNET
-  val nodePort:    String      = if(networkType == NetworkType.MAINNET) ":9053/" else ":9052/"
+  val networkType: NetworkType = NetworkType.MAINNET
+  val nodePort: String = if (networkType == NetworkType.MAINNET) ":9053/" else ":9052/"
 
   val client = RestApiErgoClient.create(
     "http://213.239.193.208" + nodePort,
@@ -15,8 +18,8 @@ object ContractClient extends App{
 
   def printAddresses(ctx: BlockchainContext, optTokenId: Option[String]) = {
     val bondContract = ScriptGenerator.mkBondContract(ctx, optTokenId)
-    val onClose      = ScriptGenerator.mkOrderContract(ctx, isFixed = false, optTokenId)
-    val fixed        = ScriptGenerator.mkOrderContract(ctx, isFixed = true, optTokenId)
+    val onClose = ScriptGenerator.mkOrderContract(ctx, isFixed = false, optTokenId)
+    val fixed = ScriptGenerator.mkOrderContract(ctx, isFixed = true, optTokenId)
 
     val tokenId = optTokenId.getOrElse("ERG")
 
@@ -27,13 +30,13 @@ object ContractClient extends App{
     println(s"Fixed Height Order: ${fixed.toAddress}")
   }
 
-  client.execute{
+  client.execute {
     ctx =>
       println(s"Using network type: ${networkType}")
 
       printAddresses(ctx, None)
 
-      tokenIds.foreach{
+      tokenIds.foreach {
         id =>
           printAddresses(ctx, Some(id))
       }

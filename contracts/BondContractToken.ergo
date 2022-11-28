@@ -21,39 +21,43 @@
     // Constants
     // _tokenId: Token id of bond currency
 
+    if(HEIGHT >= maturityHeight){
 
-    val liquidated = {
-        allOf(
-            Coll(
-                HEIGHT >= maturityHeight,
-                repaymentBox.propositionBytes   == lenderPK.propBytes,
-                repaymentBox.tokens             == collateralAssets,
-                repaymentBox.value              == collateralERG,
-                repaymentBox.R4[Coll[Byte]].get == SELF.id
-            )
-        )
-    }
-    // Collateral box returned to borrower
-    val returnBox           = OUTPUTS(1)
-    val repaid = {
-        allOf(
-            Coll(
-                // RepaymentBox Conditions
-                HEIGHT < maturityHeight,
-                repaymentBox.propositionBytes   == lenderPK.propBytes,
-                repaymentBox.value              == 1000000L,
-                repaymentBox.tokens(0)._1       == _tokenId,
-                repaymentBox.tokens(0)._2       == repayment,
-                repaymentBox.tokens.size        == 1,
-                repaymentBox.R4[Coll[Byte]].get == SELF.id,
-                // ReturnBox Conditions
-                returnBox.propositionBytes      == borrowerPK.propBytes,
-                returnBox.tokens                == collateralAssets,
-                returnBox.value                 == collateralERG
-            )
-        )
-    }
+      val liquidated = {
+          allOf(
+              Coll(
+                  repaymentBox.propositionBytes   == lenderPK.propBytes,
+                  repaymentBox.tokens             == collateralAssets,
+                  repaymentBox.value              == collateralERG,
+                  repaymentBox.R4[Coll[Byte]].get == SELF.id
+              )
+          )
+      }
 
-    (sigmaProp(liquidated)) || (sigmaProp(repaid) && borrowerPK)
+      sigmaProp(liquidated)
+    }else{
+        // Collateral box returned to borrower
+        val returnBox           = OUTPUTS(1)
+        val repaid = {
+            allOf(
+                Coll(
+                    // RepaymentBox Conditions
+                    repaymentBox.propositionBytes   == lenderPK.propBytes,
+                    repaymentBox.value              == 1000000L,
+                    repaymentBox.tokens(0)._1       == _tokenId,
+                    repaymentBox.tokens(0)._2       == repayment,
+                    repaymentBox.tokens.size        == 1,
+                    repaymentBox.R4[Coll[Byte]].get == SELF.id,
+                    // ReturnBox Conditions
+                    returnBox.propositionBytes      == borrowerPK.propBytes,
+                    returnBox.tokens                == collateralAssets,
+                    returnBox.value                 == collateralERG
+                )
+            )
+        }
+
+        (sigmaProp(repaid) && borrowerPK)
+      }
+
 
 }
