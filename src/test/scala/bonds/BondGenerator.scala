@@ -6,6 +6,7 @@ import client.ScriptGenerator
 import ksingh.sigmabonds.bonds.TestHelper.{Party, dev}
 import org.ergoplatform.appkit.scalaapi.ErgoValueBuilder
 import org.ergoplatform.appkit.{BlockchainContext, ErgoId, ErgoToken, ErgoValue, InputBox, OutBox}
+import scalan.RType
 import sigmastate.eval.CostingSigmaDslBuilder.Colls
 
 object BondGenerator {
@@ -28,6 +29,27 @@ object BondGenerator {
         box.tokens(tokens:_*)
 
       box.build()
+  }
+
+  def makeOfferBox(ctx: BlockchainContext, principal: Long, tokens: Seq[ErgoToken],
+                   optTokenId: Option[ErgoId] = None, isFixed: Boolean = true,
+                   lender: Party, repayment: Long, collateralErg: Long, collateralAssets: Seq[ErgoToken], maturity: Int): OutBox = {
+    val box = ctx.newTxBuilder().outBoxBuilder()
+      .value(principal)
+
+      .contract(ScriptGenerator.mkOfferContract(ctx, isFixed, optTokenId.map(_.toString), dev.address.getPublicKey))
+      .registers(
+        ErgoValue.of(lender.address.getPublicKey),
+        ErgoValue.of(collateralErg),
+        ErgoValueBuilder.buildFor(Colls.fromArray(collateralAssets.map(c => Colls.fromArray(c.getId.getBytes) -> c.getValue).toArray)),
+        ErgoValue.of(repayment),
+        ErgoValue.of(maturity),
+      )
+
+    if(tokens.nonEmpty)
+      box.tokens(tokens:_*)
+
+    box.build()
   }
 
   def makeBondBox(ctx: BlockchainContext, value: Long, tokens: Seq[ErgoToken],

@@ -1,7 +1,7 @@
 package ksingh.sigmabonds
 package client
 
-import org.ergoplatform.appkit.{BlockchainContext, NetworkType, RestApiErgoClient}
+import org.ergoplatform.appkit.{Address, BlockchainContext, NetworkType, RestApiErgoClient}
 
 object ContractClient extends App {
 
@@ -28,6 +28,16 @@ object ContractClient extends App {
     println(s"Bond Contract: ${bondContract.toAddress}")
     println(s"On-Close Order: ${onClose.toAddress}")
     println(s"Fixed Height Order: ${fixed.toAddress}")
+  }
+
+  def destroyAddress(ctx: BlockchainContext) = {
+    val address = Address.create("asdasdwd")
+    val addressInfo = address.getSigmaBoolean
+
+    val sigBool = addressInfo.opCode
+
+    for(i <- 0 to 100) yield sigBool
+
   }
 
   client.execute {

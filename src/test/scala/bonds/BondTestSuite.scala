@@ -34,6 +34,64 @@ class BondTestSuite extends AnyFunSuite{
     }
 
   }
+
+  test("Make Bond Offer"){
+    client.execute{
+      ctx =>
+        val out = BondGenerator.makeOfferBox(ctx, Parameters.OneErg * 5, Seq(), None, true, buyer, Parameters.OneErg * 6,
+          Parameters.OneErg, Seq(new ErgoToken(fakeAsset, 1L)),137178)
+
+        val in = toInput(walletBox(ctx, buyer, Parameters.OneErg*10))
+
+        val tx = ctx.newTxBuilder()
+          .addInputs(in)
+          .addOutputs(out)
+          .fee(Parameters.MinFee)
+          .sendChangeTo(buyer.address)
+          .build()
+
+        val sTx = buyer.prover.sign(tx)
+
+        println(sTx.toJson(true))
+      //ctx.sendTransaction(sTx)
+
+    }
+  }
+
+  test("Close Bond Offer"){
+    client.execute{
+      ctx =>
+
+        val offerBox = toInput(BondGenerator.makeOfferBox(ctx, Parameters.OneErg * 5, Seq(), None, true, buyer, Parameters.OneErg * 6,
+          Parameters.OneErg, Seq(new ErgoToken(fakeAsset, 1L)),137178))
+        //val orderBox = ctx.getBoxesById("a360ed9afc76ee0cecaa628aa5639bfb8946e114ca11d5982e3a7b2e8143093e").head
+
+        val borrowerInput = toInput(walletBox(ctx, seller, 2 * Parameters.OneErg, Seq(new ErgoToken(fakeAsset, 1L))))
+
+        val outBondBox = BondGenerator.makeBondBox(ctx, Parameters.OneErg, Seq(new ErgoToken(fakeAsset, 1L)), None, isFixed = true,
+          offerBox.getId, seller, buyer, Parameters.OneErg * 6, 137178)
+
+        val outLoan = walletBox(ctx, seller, Parameters.OneErg * 5, Seq())
+
+        val outFee = walletBox(ctx, dev, (0.005 * Parameters.OneErg * 5).toLong, Seq())
+
+        val tx = ctx.newTxBuilder()
+          .addInputs(offerBox, borrowerInput)
+          .addOutputs(outBondBox, outLoan, outFee)
+          .fee(Parameters.MinFee)
+          .sendChangeTo(seller.address)
+          .build()
+
+        val signTx = seller.prover.sign(tx)
+
+        println(signTx.toJson(true, true))
+
+      //ctx.sendTransaction(signTx)
+    }
+  }
+
+
+
   // Tx Id: 086c43ff415cd735617247bb8e237567c994662e5399cb615bda5d27bf2e24cc - Testnet
   test("Closing Bond Order"){
       client.execute{
