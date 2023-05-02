@@ -160,7 +160,7 @@ Simply copy the value of `maturity` into the bond maturity height (So copying R7
 bond utxo).
 
 At the same time, `OUTPUTS(1)` will have a utxo going to the borrower's PK, which
-is holding the total principal amount (with UI & Dev Fees subtracted) specified contents of the offer UTXO.
+is holding the total principal amount (with UI & Dev Fees subtracted) as specified by the contents of the offer UTXO.
 If the principal is in tokens, the only value of ERG that can be accepted is `0.001`
 ## Tx 3: RePay Bond Order
 Once a bond order has been fulfilled / closed, a bond utxo with specific information then exists on the blockchain. If the
