@@ -62,22 +62,22 @@ class BondTestSuite extends AnyFunSuite{
     client.execute{
       ctx =>
 
-        val offerBox = toInput(BondGenerator.makeOfferBox(ctx, Parameters.OneErg * 5, Seq(), None, true, buyer, Parameters.OneErg * 6,
+        val offerBox = toInput(BondGenerator.makeOfferBox(ctx, Parameters.MinFee, Seq(new ErgoToken(fakeCurrency, 1)), Some(fakeCurrency), true, buyer, Parameters.OneErg * 6,
           Parameters.OneErg, Seq(new ErgoToken(fakeAsset, 1L)),137178))
         //val orderBox = ctx.getBoxesById("a360ed9afc76ee0cecaa628aa5639bfb8946e114ca11d5982e3a7b2e8143093e").head
 
         val borrowerInput = toInput(walletBox(ctx, seller, 2 * Parameters.OneErg, Seq(new ErgoToken(fakeAsset, 1L))))
 
-        val outBondBox = BondGenerator.makeBondBox(ctx, Parameters.OneErg, Seq(new ErgoToken(fakeAsset, 1L)), None, isFixed = true,
+        val outBondBox = BondGenerator.makeBondBox(ctx, Parameters.OneErg, Seq(new ErgoToken(fakeAsset, 1L)), Some(fakeCurrency), isFixed = true,
           offerBox.getId, seller, buyer, Parameters.OneErg * 6, 137178)
 
-        val outLoan = walletBox(ctx, seller, Parameters.OneErg * 5, Seq())
+        val outLoan = walletBox(ctx, seller, Parameters.MinFee, Seq(new ErgoToken(fakeCurrency, 1)))
 
-        val outFee = walletBox(ctx, dev, (0.005 * Parameters.OneErg * 5).toLong, Seq())
+       // val outFee = walletBox(ctx, dev, (0.005 * Parameters.OneErg * 5).toLong, Seq())
 
         val tx = ctx.newTxBuilder()
           .addInputs(offerBox, borrowerInput)
-          .addOutputs(outBondBox, outLoan, outFee)
+          .addOutputs(outBondBox, outLoan)
           .fee(Parameters.MinFee)
           .sendChangeTo(seller.address)
           .build()

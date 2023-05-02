@@ -53,7 +53,10 @@
     if(orderIsClosed){
         // Order Matched / Closed path
         val loanBox     = OUTPUTS(1)
-
+        val totalFees   = fees.fold(0.toBigInt, {
+          (z: BigInt, b: (SigmaProp, BigInt)) =>
+            z + b._2
+        })
         val orderMade   = {
             allOf(
                 Coll(
@@ -72,7 +75,7 @@
 
                     // Loan Conditions
                     loanBox.propositionBytes   == borrowerPK.propBytes,
-                    loanBox.value              == principal
+                    loanBox.value              == principal - totalFees
                 )
             )
         }

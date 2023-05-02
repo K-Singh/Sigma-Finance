@@ -39,9 +39,9 @@
 
         val feeDenom = 100000L
         val devFee   = 500L         // 0.5%
-        // If ui fee is defined, then we add an additional 0.4% fee
+        // If ui fee is defined, then we add an additional 0.5% fee
         if(optUIFee.isDefined){
-            val uiFee = 400L        // 0.4%
+            val uiFee = 500L        // 0.5%
 
             Coll(
                  (_devPK, (devFee.toBigInt * principal.toBigInt) / feeDenom.toBigInt),

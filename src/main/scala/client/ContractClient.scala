@@ -20,6 +20,7 @@ object ContractClient extends App {
     val bondContract = ScriptGenerator.mkBondContract(ctx, optTokenId)
     val onClose = ScriptGenerator.mkOrderContract(ctx, isFixed = false, optTokenId)
     val fixed = ScriptGenerator.mkOrderContract(ctx, isFixed = true, optTokenId)
+    val fixedOffer = ScriptGenerator.mkOfferContract(ctx, isFixed = true, optTokenId)
 
     val tokenId = optTokenId.getOrElse("ERG")
 
@@ -28,16 +29,8 @@ object ContractClient extends App {
     println(s"Bond Contract: ${bondContract.toAddress}")
     println(s"On-Close Order: ${onClose.toAddress}")
     println(s"Fixed Height Order: ${fixed.toAddress}")
-  }
-
-  def destroyAddress(ctx: BlockchainContext) = {
-    val address = Address.create("asdasdwd")
-    val addressInfo = address.getSigmaBoolean
-
-    val sigBool = addressInfo.opCode
-
-    for(i <- 0 to 100) yield sigBool
-
+    println(s"Fixed Height Offer: ${fixedOffer.toAddress}")
+    println()
   }
 
   client.execute {

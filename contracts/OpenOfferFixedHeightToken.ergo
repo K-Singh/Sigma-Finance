@@ -6,7 +6,7 @@
     // R5: Bond Collateral (In number of nanoERG): Long
     // R6: Bond Collateral Assets: Coll(Coll[Byte], Long)
     // R7: Total Repayment (In number of tokens): Long
-    // R7: Bond Maturity Height: Int
+    // R8: Bond Maturity Height: Int
 
     // Principal represents the amount of tokens the borrower gets immediately upon a Bond order being taken by a lender.
     // Total Repayment is the amount of tokens the lender must receive before the maturity height, in order for
@@ -39,9 +39,9 @@
 
         val feeDenom = 100000L
         val devFee   = 500L         // 0.5%
-        // If ui fee is defined, then we add an additional 0.4% fee
+        // If ui fee is defined, then we add an additional 0.5% fee
         if(optUIFee.isDefined){
-            val uiFee = 400L        // 0.4%
+            val uiFee = 500L        // 0.5%
 
             Coll(
                  (_devPK, (devFee.toBigInt * principal.toBigInt) / feeDenom.toBigInt),
@@ -55,7 +55,10 @@
     if(orderIsClosed){
         // Order Matched / Closed path
         val loanBox     = OUTPUTS(1)
-
+        val totalFees   = fees.fold(0.toBigInt, {
+          (z: BigInt, b: (SigmaProp, BigInt)) =>
+            z + b._2
+        })
         val orderMade   = {
             allOf(
                 Coll(
@@ -76,7 +79,7 @@
                     loanBox.propositionBytes   == bondBox.R5[SigmaProp].get.propBytes,
                     loanBox.value              == 1000000L,
                     loanBox.tokens(0)._1       == _tokenId,
-                    loanBox.tokens(0)._2       == principal,
+                    loanBox.tokens(0)._2       == principal - totalFees,
                     loanBox.tokens.size        == 1,
                     SELF.tokens.size           == 1, // Ensure only one token used for lending
                     SELF.tokens(0)._1          == _tokenId,

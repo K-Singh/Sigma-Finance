@@ -37,9 +37,15 @@ The UI fee output will be `OUTPUTS(3)`. `OUTPUTS(2)` will be the dev fee, with a
 SigmaBonds has no plans to make a token, and likely never will.
 
 ## Fees
-There is a 0.5% developer fee while using SigmaBonds, which is taken from the lender when an order is first closed.
+### Orders
+There is a 0.5% developer fee while using SigmaBond Orders, which is taken from the lender when an order is first closed.
 An additional 0.4% may be taken by frontend developers who implement a UI for
-SigmaBonds.
+SigmaBond Orders.
+
+### Offers
+There is a 0.5% developer fee while using SigmaBond Orders, which is taken from the borrower's loan when an offer is first closed.
+An additional 0.5% may be taken by frontend developers who implement a UI for
+SigmaBond Offers.
 
 # Protocol
 There are 4 main transactions which must be implemented from a frontend interface
@@ -60,6 +66,8 @@ Mainnet Order Contract (On-Close):
 Mainnet Order Contract (Fixed-Height):
 `9drQ9RPn3p6hMfLBBffMoNSXzpa8eFpxz922UjQVKXWL8nyHNkRVhLWoKzkE8xWL9AHHHnh3HgrqjC9XjVu7KR4gL1fnrVWcQcrHiUSAEacsUNvkwFCy9xoG52UTAbj3jJyvkhNQg2h2RV86CniFXEsS6bRDcAdTAN8ytLLMAuE3DcMjgntsXeyVwrGRWYrktmtm6xCVAYnFRJhopAUTmYqGEmE2FnpC9uuqvG2bVR9xvngZJ1SxZzti7XnhsW6pSvMBLbVNcbGCJp3STHkrNU2QGV6WsgcHcif6aSMpnjQ26E1v3LMQ75RkWSU2RYnkKS8bbwQmAPrLTcnsC87Gj4gMTf1Agz62Smh7emvXUVqMYmfCF8yah3WthGsWUJb5jGa2VdAFoB7UyB7ksg4MYBPKX6QhCWsEuNjS2WJY6ZAVPtiU3cJbAmMqpqhY1FExJD4tXA1A7B3yTwFrq2epWdoHuSLewCpubNmJSXn5EVRiW6JN8vz5U1P4Jk4R4sRZBKtz2PFu53HEEgvc1TjGZ8sQA96mh74h26zEA3kWUEv6tP8pyFQYByr9xLARgngVNNXk6Hz8UFyyBt3xNr9kxNtA5hh`
 
+Mainnet Offer Contract (Fixed-Height):
+`JLnFvL2xubxtxwnfkHV8368NCaUvKUoxsmzq1hfo4h2y1J9pbJL5CUhrGVqLFVn4h7GuCs7hVfHayB5P3h2BXS2Xqk3gpX2C2rDjaKQHXgiGB3d9ShGdzn7Nes7h6Fnkiiz3RcvxMb1VEuCdaWyFSBzLBvenbnhfWW7iX2mtnZQGwgH2t3dZvEjnbamyf6RguxbKXKXTxsphZgrVmxnBBwj5QaRuLrSuDxwhBDvKkFw3zRtTSQfzEKxsy52D17yYmifP1qczST5mH5oSNRuKh4FnFTpBpRQvWC1zSPkJTLyA4kvWADLkF4ftWgmAYkPpuU8JqisenhsnRrqg4eoS4mSBMADccJ1NvaksYBCaKY7q8NUMFQwhXYp6e1Z5TvvhKnBVhhmAgDagGeF4jwQWmZsCGS37h1vZ62fWMc2sdprt8Dg2pcbr2ocUjZcAiWLh8aXoNc7h72Q7x1LMWoPgMEpPphsciM62WJqc9YbLthZ7798iZ94uvBoP5mG8JDDCqza5ssZoAb2pyLqXNrmKwCPGDdPEGX3h9oVoK7uWhKH2LEY6cxZA29TUGjWqCYvVQphtTQBU17vVQPLcbUDm`
 
 Testnet Bond Contract:
 `4TwNASK7pbxYLmVWa2Xo7BSpfq2aiuLtYX7XWtA3Y1iwSZU8a4NpViuVQakJmtUqqi7YX5T6B58C9TFgjhx1FNHVR4UxwXzVR22haFAhMT16eg1HyZkJpRHbhaFpaZ6Kbz3BLYtqR6oVhKvrmBkzv69St6vGjG9BekxfevL8AXVwTSGFRTnP7DNMYZLESKSLJuwGThLoWqU4ouC6J`
@@ -80,7 +88,10 @@ Mainnet Order Contract (On-Close):
 Mainnet Order Contract (Fixed-Height):
 `CExp7TDXwCNoFe5Ad3Mbiwkwd5Y9y9JmKPftycdMuwfUUy8WbaAfAr6kjSQWTK53LPrvEemmdnwMXWrKYpfhhnPMfFEA1c8nSdxdZ93V2HTMtKLFPscG4cwUCiw7Xg4g31UbLT2PkTUtkRBqsaiEUn8mU1hf5jNUoB9DwzbcBVaoHn7xWS3wrTFYJFU4bdD3Qstm88Yj3YZ86iC8Sq31ScQbCP7xrvyZPk7tAWhJehT7Hq5LWwHHeeGifjK4AEhXQe4qgzdGphPntYpySZcd94eCLbdB91YzfgirtkVBQaxA24WyX2Hxq5iwUha3JM5WCxkvoxEFZdujNVncsiafRWsvinAgAJAgk4SK55CgqzETo4smphqUVKzZYgYxGTcWfhqRh31Ly8BXwCc3EywRwPbSe56PjoJmXidcoY57CbG2LUutnDnQf2Q9jMCfGnmbgXDrz4mJNuw8wDaZXtkcHFKkTMLpB2xfJQgS2NtVsRxHL5qFrrrP9f18meiiE4rE1cSWzxSqJfxriyfho91j8xDJiLg1moaZuwnN9V5LQ4uLJ8u3wyxSfV8xRzufudRHbJ8L936G9rZ3RybJeFL35SBwnkZ3jfWnmKb9xRoyYicHHVmLRB8Z4bja9GeNk1EnerTasv7gTHrGDKgsdkLYN4Atg9NqTbbnyM8gTyn6wbWetxwMHNoeMHnA63kCceuS4xM9wrD1U6dXQ9CJCS9myxWyD4sewYYB3n8ZR9LiEpu3iNAExngi3xaGT4aKhACjbfTr76d1nK8fvPrbCGn6nJL7fLN6ApPg53WznkQ6jM1crZk5vv4MNac5YwfK6ra`
 
-## Tx 1: Open Bond Order
+Mainnet Offer Contract (Fixed-Height):
+`zXwrGkN9w6ErQEsXFBc4WhatY2PH2dBECTjBJ7qxEy2FNW4hy6UHRg4sGVYoxTZPNPTPhrT36RAF7JJR9K3bTQkZK5837iqMFr9ca4eeG1UpWmUkDaQSfu531bpvV9wuYk1mLuWqStgdXo87D9UvF7pk6RqwHYsY3efvbWYVUDBMM6um2dEaxBqXLVVzvuBSdseEXwy3d3UaBJDHamHPaoJbvLTzWNzzvXpL4YRR1XGDkeiWeWyByq8s152ZP1WzVMbzeJUQwfGdhaeAscr3F2ktJxFV4ED77BYu7X4mntmhUirdZwjH4juez2S5BfVv6ZkTvfuXkAV5pL5wVqHHVbuZXcwJZRLPWWNPvHL6BCSHAxnkSs51DCWhuoc92ikmeWTJx5Fzeqm4Wd826Lfqdk95MKF6ogiqiqwTD7AA5y4zhKnBkAGYFDuSmrMdLPN3th26U2JEH77Cqe8M2z9pqVoj7gmkMuCTzVuBX8v4Qd8TyX7deR6qBdZeeQZSz1CSaiutcJvUzUFbMtLyanqvu3USFKszWHsWkGXjCJqdEEFSgkm2P21cq87orseH17HuXrmGNEehNvoaCYsYoLUTjhS6GB4kXWY7EEvqsFbc1s4eMuVJ2x1fz4BKaZmUVVyhDPYRWFmxJPmk8psXbRvjvCJCWQSFK7YQSa4GrTciAALsTj6AVV2aH25dSdFXPg6ZCGsDGDfK38UUniD43pCFkwaAKYTorXEZeLbB6vLKNEe6LMoJnag64JcB5V2EJ4jhC1Zww2AZmugifT3k1ZFFYvgBbNtbSbpEnSWkKtZSkLmvqA1WTGQDSeRoBCoxFfyo3j3L9Z3Wct8xfEJyZhgDBN5seUjKt3iQToJ2ELrzP7egehUVYn3EaRCDG5ThfLDpiC9jtrQwnkR9B2yUdGkKkV`
+
+## Tx 1A: Open Bond Order
 In this transaction, a borrower wishes to create a new bond request / order on the
 blockchain. The borrower will send all the collateral (assets + ERG) they wish
 to use for their bond to a utxo under the bond order contract. On this outputted UTXO, they
@@ -94,16 +105,27 @@ Bond Maturity comes in two different forms:
 If order is of "OnClose" type, then it represents bond which expires a number of blocks after
 closing of the order. In this case, value must be greater than or equal to 30 (meaning minimum duration of 30 blocks).
 
+## Tx 1B: Open Bond Offer
+In this transaction, a lender wishes to create a new bond offer on the
+blockchain. The lender will send the total amount of ERG or quantity of a specific (singular) token to a utxo under the 
+`OpenOffer` contract. This will be used as the loan to the borrower upon offer closure. In the case of a token offer, the utxo MUST have a value of `0.001 ERG`. On this outputted UTXO, they
+will set the following registers to record information about their potential bond.
+- R4: Lender's PK: `SigmaProp`
+- R5: Bond Collateral ERG (In nanoERGs): `Long`
+- R6: Bond Collateral Assets (tokens): `Coll[(Coll[Byte], Long)]`
+- R7: Total Repayment (In tokens / nanoERGs): `Long`
+- R8: Maturity: `Int`
 
-If order is of "FixedHeight" type, then the
-value stored in maturity is copied into R7 of the bond box.
-## Tx 2: Close Bond Order
+Currently, only Fixed Height bonds are available for Bond Offers.
+
+
+## Tx 2A: Close Bond Order
 In this transaction, a lender has found a bond order they wish to fulfill by sending
 the principal amount back to the borrower. The lender will first create a
 bond contract utxo in `OUTPUTS(0)`. They will set the following registers on it:
 - R4: Box id of originating order: `Coll[Byte]`
 - R5: borrowerPK: `SigmaProp`
-- R6: Total Repayment (In number of raw / non-decimaled SIGUSD tokens): `Long`
+- R6: Total Repayment (In number of nanoERGs / non-decimaled tokens): `Long`
 - R7: Bond Maturity Height (Height at which bond may be liquidated): `Int` 
 - R8: lenderPK: `SigmaProp`
 
@@ -121,6 +143,24 @@ bond utxo).
 
 At the same time, `OUTPUTS(1)` will have a utxo going to the borrower's PK, which
 is holding the total principal amount specified by the borrower in R5 of the order contract.
+If the principal is in tokens, the only value of ERG that can be accepted is `0.001`
+
+## Tx 2B: Close Bond Offer
+In this transaction, a borrower has found a bond offer they wish to fulfill by claiming the loan present in the offer utxo,
+and then sending their required collateral into an outputted bond UTXO. The borrower will create a
+bond contract UTXO in `OUTPUTS(0)`. They will set the following registers on it:
+- R4: Box id of originating order: `Coll[Byte]`
+- R5: borrowerPK: `SigmaProp`
+- R6: Total Repayment (In number of nanoERGs / non-decimaled tokens): `Long`
+- R7: Bond Maturity Height (Height at which bond may be liquidated): `Int`
+- R8: lenderPK: `SigmaProp`
+
+To set `maturity`:
+Simply copy the value of `maturity` into the bond maturity height (So copying R7 of open order into R7 of
+bond utxo).
+
+At the same time, `OUTPUTS(1)` will have a utxo going to the borrower's PK, which
+is holding the total principal amount (with UI & Dev Fees subtracted) specified contents of the offer UTXO.
 If the principal is in tokens, the only value of ERG that can be accepted is `0.001`
 ## Tx 3: RePay Bond Order
 Once a bond order has been fulfilled / closed, a bond utxo with specific information then exists on the blockchain. If the
